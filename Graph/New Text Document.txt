@@ -1,38 +1,51 @@
-547. Number of Provinces
-There are n cities. Some of them are connected, while some are not. If city a is connected directly with city b, and city b is connected directly with city c, then city a is connected indirectly with city c.A province is a group of directly or indirectly connected cities and no other cities outside of the group.You are given an n x n matrix isConnected where isConnected[i][j] = 1 if the ith city and the jth city are directly connected, and isConnected[i][j] = 0 otherwise.
-Return the total number of provinces.
+207. Course Schedule
+There are a total of numCourses courses you have to take, labeled from 0 to numCourses - 1. You are given an array prerequisites where prerequisites[i] = [ai, bi] indicates that you must take course bi first if you want to take course ai.
+    For example, the pair [0, 1], indicates that to take course 0 you have to first take course 1.
+Return true if you can finish all courses. Otherwise, return false.
+
 Example 1:
-Input: isConnected = [[1,1,0],[1,1,0],[0,0,1]]
-Output: 2
+Input: numCourses = 2, prerequisites = [[1,0]]
+Output: true
+Explanation: There are a total of 2 courses to take. 
+To take course 1 you should have finished course 0. So it is possible.
 
 Example 2:
-Input: isConnected = [[1,0,0],[0,1,0],[0,0,1]]
-Output: 3
+Input: numCourses = 2, prerequisites = [[1,0],[0,1]]
+Output: false
+Explanation: There are a total of 2 courses to take. 
+To take course 1 you should have finished course 0, and to take course 0 you should also have finished course 1. So it is impossible.
 
-hint:
-travers all connected node and make it visited.then check every cities if its visited or not and count accordingly.
+Solution:
 
 class Solution {
-    public int findCircleNum(int[][] isConnected) {
-       int n=isConnected.length;
-       int[]seen=new int[n];
-        int count=0;
-//traverse cities.
-        for(int i=0;i<n;i++){
-           if(seen[i]==0){
-               dfs(isConnected,seen,i);
-               count++;
-           }
+    public boolean canFinish(int numCourses, int[][] prerequisites) {
+        int[]inDegree=new int[numCourses];
+        ArrayList<Integer>bfs=new ArrayList<>();
+        HashMap<Integer,ArrayList<Integer>>hm=new HashMap<>();
+        for(int i=0;i<numCourses;i++){
+            inDegree[prerequisites[i][0]]++;
         }
-        return count;
-    }
-    public void dfs(int[][]isConnected,int[]seen,int i){
-//traverse connected nodes.
-        for(int j=0;j<isConnected.length;j++){
-            if(isConnected[i][j]==1 && seen[j]==0){
-                seen[j]=1;
-                dfs(isConnected,seen,j);
+        for(int j=0;j<numCourses;j++){
+            int key=prerequisites[j][1];
+                int value=prerequisites[j][0];
+            ArrayList<Integer>a=new ArrayList<>();;
+            if(!hm.containsKey(key)){
+                a=new ArrayList<>();
+                a.add(value);
+            }
+            hm.put(key,a);
+        }
+        for(int i=0;i<numCourses;i++){
+            if(inDegree[i]==0)
+                bfs.add(i);
+        }
+        for(int val:bfs){
+            for(int child:hm.get(val)){
+                if(--inDegree[child]==0){
+                    bfs.add(child);
+                }
             }
         }
+        return bfs.size()==numCourses;
     }
 }
